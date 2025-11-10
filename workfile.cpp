@@ -7,7 +7,10 @@ struct IntArray{
   int last() const;
   IntArray(int i);
   ~IntArray();
+  int * a;
+  size_t k;
 };
+
 int main()
 {
   try
@@ -36,3 +39,9 @@ int main()
     std::cerr << error.what() << "\n";
   }
 }
+
+IntArray::~IntArray()
+{
+  delete [] a;
+}
+
