@@ -1,14 +1,14 @@
 #include <iostream>
 
 struct IntArray{
-  void add (int i);
-  int get(size_t id) const noexcept;
+  void add (unsigned int i);
+  unsigned int get(size_t id) const noexcept;
   int at(size_t id) const;
   size_t size() const noexcept;
-  int last() const noexcept;
-  IntArray(int i);
+  unsigned int last() const noexcept;
+  IntArray(unsigned int i);
   ~IntArray();
-  int * a;
+  unsigned int * a;
   size_t k;
 };
 
@@ -16,7 +16,7 @@ int main()
 {
   try
   {
-    int next = 0;
+    unsigned int next = 0;
     std::cin >> next;
     IntArray a(next);
     while (std::cin >> next)
@@ -25,19 +25,21 @@ int main()
     }
     if (std::cin.fail() and !std::cin.eof())
     {
-      retrun 1;
+      std::cerr << "Error: wrong input\n";
+      return 1;
     }
     size_t count = 1;
     for (size_t i = 0; i < a.size() - 1; ++i)
     {
-      int d = a.get(i);
-      count += !(d % a.last)? 1 : 0;
+      unsigned int d = a.get(i);
+      count += !(d % a.last())? 1 : 0;
     }
     std::cout << count << "\n";
   }
   catch( const std::bad_alloc & error)
   {
     std::cerr << error.what() << "\n";
+    return 2;
   }
 }
 
@@ -45,13 +47,13 @@ IntArray::~IntArray()
 {
   delete [] a;
 }
-IntArray::~IntArray(int i):
-  a(new int [1]),
+IntArray::IntArray(unsigned int i) :
+  a(new unsigned int [1]),
   k(1)
 {
   a[0] = i;
 }
-int IntArray::get(size_t id) const noexcept
+unsigned int IntArray::get(size_t id) const noexcept
 {
   return a[id];
 }
@@ -59,19 +61,19 @@ size_t IntArray::size() const noexcept
 {
   return k;
 }
-int IntArray::last (int i) const noexcept
+unsigned int IntArray::last() const noexcept
 {
   return get(size() - 1);
 }
-void IntArray::add(int i)
+void IntArray::add(unsigned int i)
 {
-  int * temp = new int [size() + 1];
-  for (size_t i = 0; i < size(); ++i)
+  unsigned int * temp = new unsigned int [size() + 1];
+  for (size_t n = 0; n < size(); ++n)
   {
-    temp[i] = get[i];
+    temp[i] = get(i);
   }
+  temp[size()] = i;
   delete[] a;
   a = temp;
   ++k;
 }
-
