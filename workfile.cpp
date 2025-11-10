@@ -10,22 +10,29 @@ struct IntArray{
 };
 int main()
 {
-  int next = 0;
-  std::cin >> next;
-  IntArray a(next);
-  while (std::cin >> next)
+  try
   {
-    a.add(next);
+    int next = 0;
+    std::cin >> next;
+    IntArray a(next);
+    while (std::cin >> next)
+    {
+      a.add(next);
+    }
+    if (std::cin.fail() and !std::cin.eof())
+    {
+      retrun 1;
+    }
+    size_t count = 1;
+    for (size_t i = 0; i < a.size() - 1; ++i)
+    {
+      int d = a.get(i);
+      count += !(d % a.last)? 1 : 0;
+    }
+    std::cout << count << "\n";
   }
-  if (!std::cin.fail())
+  catch( const std::bad_alloc & error)
   {
-    retrun 1;
+    std::cerr << error.what() << "\n";
   }
-  size_t count = 1;
-  for (size_t i = 0; i < a.size() - 1; ++i)
-  {
-    int d = a.get(i);
-    count += !(d % a.last)? 1 : 0;
-  }
-  std::cout << count << "\n";
 }
