@@ -1,5 +1,9 @@
 #include <iostream>
 
+struct IntArray{
+  void add (int i);
+  int get(size_t id) const;
+};
 int main()
 {
   int next = 0;
@@ -8,4 +12,6 @@ int main()
   {
     return 1;
   }
+  IntArray a;
+  a.add(next);
 }
