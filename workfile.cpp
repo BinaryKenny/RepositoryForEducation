@@ -4,14 +4,14 @@ struct IntArray{
   void add (unsigned int i);
   unsigned int get(size_t id) const noexcept;
   int at(size_t id) const;
-  size_t size() const noexcept;
+  size_t getsize() const noexcept;
   unsigned int last() const noexcept;
   IntArray(unsigned int i);
   ~IntArray();
   IntArray(const IntArray & rhs);
   IntArray operator=(const IntArray & rhs);
   unsigned int * a;
-  size_t k;
+  size_t size;
 };
 
 int main()
@@ -77,10 +77,10 @@ void IntArray::add(unsigned int i)
   temp[size()] = i;
   delete[] a;
   a = temp;
-  ++k;
+  ++size;
 }
-IntArray::IntArray(const IntArray & rhs) :
-  data(new int [rhs.getsize()]),
+IntArray3::IntArray(const IntArray & rhs) :
+  data(new unsigned int [rhs.getsize()]),
   getsize(rhs.getsize())
 {
   for (size_t i = 0; i < getsize(); ++i){
@@ -88,7 +88,7 @@ IntArray::IntArray(const IntArray & rhs) :
   }
 }
 IntArray & IntArray::operator=(const IntArray & rhs){
-  int * temp = new int [rhs.getsize()];
+  unsigned int * temp = new unsigned int [rhs.getsize()];
   for (size_t i = 0; i < rhs.getsize(); ++i){
     temp[i] = rhs.get(i);
   }
