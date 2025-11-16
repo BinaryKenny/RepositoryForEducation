@@ -13,8 +13,13 @@ struct IntMatrix{
   IntMatrix operator=(const IntMatrix & rhs);
   void add_string(size_t str_id, int element);
   void add_column(size_t str_id, int element);
+  void add(size_t str_id1, size_t str_id2);
+  void output();
   int * data;
   size_t size;
+  size_t size;
+  size_t rows;
+  size_t cols;
 };
 
 int main(int argc, char ** argv)
@@ -24,6 +29,8 @@ int main(int argc, char ** argv)
   int first = 0;
   input >> rows >> cols >> first;
   IntMatrix matrix(first);
+  matrix.rows = rows;
+  matrix.cols = cols;
   for (size_t i = 1; i < rows * cols; ++i)
   {
     int temp = 0;
@@ -33,34 +40,44 @@ int main(int argc, char ** argv)
     }
     else
     {
-      delete [] matrix;
       throw std::invalid_argument("Bad element");
     }
     std::cout << "Write your commands\n";
-    while(!(std::cin.eof()))
+    while(true)
     {
       int c1 = 0, c2 = 0, c3 = 0;
-      if (!(std::cin >> c1 >> c2 >> c3))
+      if (std::cin >> c1 >> c2 >> c3)
       {
-        throw std::logic_error("Wong commands or arguments");
-      }
-      if (c1 == 1)
-      {
-        matrix.add_string(c2, c3);
-      }
-      else if (c1 == 2)
-      {
-        matrix.add_column(c2, c3);
-      }
-      else if (c3 == 3)
-      {
-        //third method
+        if (c1 == 1)
+        {
+          matrix.add_string(c2, c3);
+        }
+        else if (c1 == 2)
+        {
+          matrix.add_column(c2, c3);
+        }
+        else if (c3 == 3)
+        {
+          matrix.add(c2, c3);
+        }
+        else
+        {
+          throw std::invalid_argument("Unknown command");
+        }
       }
       else
       {
-        throw std::invalid_argument("Unknown command");
+        if (std::cin.eof())
+        {
+          break;
+        }
+        else
+        {
+           throw std::logic_error("Wrong commands or arguments");
+        }
       }
     }
+  matrix.output();
 }
 
 IntMatrix::~IntMatrix()
@@ -69,9 +86,12 @@ IntMatrix::~IntMatrix()
 }
 IntMatrix::IntMatrix(int i) :
   data(new int [1]),
-  size(1)
+  size(1),
+  rows(1),
+  cols(1)
+  
 {
-  a[0] = i;
+  data[0] = i;
 }
 int IntMatrix::get(size_t id) const noexcept
 {
@@ -99,7 +119,9 @@ void IntMatrix::add(int i)
 }
 IntMatrix::IntMatrix(const IntMatrix & rhs) :
   data(new int [rhs.getsize()]),
-  size(rhs.getsize())
+  size(rhs.getsize()),
+  rows(rhs.rows),
+  cols(rhs.cols)
 {
   for (size_t i = 0; i < getsize(); ++i){
     data[i] = rhs.get(i);
@@ -113,6 +135,8 @@ IntMatrix & IntMatrix::operator=(const IntMatrix & rhs){
   delete [] data;
   data = temp;
   size = rhs.getsize();
+  rows = rhs.rows;
+  cols = rhs.cols;
   return *this;
 }
 void IntMatrix::add_string(size_t str_id, int element)
@@ -143,7 +167,7 @@ void IntMatrix::add_column(size_t str_id, int element)
     int * temp = new int [size + rows];
     for (size_t i = 0; i < size + rows; ++i)
     {
-        if (i == count * rows + str_id and count < rows)
+        if (i == count * (rows + 1) + str_id and count < rows)
         {
             temp[i] = element;
             count++;
@@ -158,3 +182,41 @@ void IntMatrix::add_column(size_t str_id, int element)
     size+=rows;
     cols++;
 }
+void IntMatrix::add(size_t str_id1, size_t str_id2)
+{
+  int * temp = new int [size + cols + rows + 1];
+  size_t count = 0, count_data = 0;
+  for (size_t i = 0; i < size + rows + cols + 1; ++i)
+  {
+    if (count < rows + 1 and i == (cols + 1) * count + str_id2)
+    {
+      temp[i] = 0;
+      count++;
+    }
+    else if (i >= (cols + 1) * str_id1 and i < (cols + 1) * (str_id1 + 1))
+    {
+      temp[i] = 0;
+    }
+    else
+    {
+      temp[i] = get(count_data);
+      count_data++;
+    }
+  }
+  size+=(cols + rows + 1);
+  rows++;
+  cols++;
+  delete [] data;
+  data = temp;
+}
+void IntMatrix::output()
+{
+  for (size_t i = 0; i < size; i++)
+  {
+    std::cout << data[i] << " ";
+    if ((i + 1) % cols == 0)
+    {
+      std::cout << "\n";
+    }
+  }
+}  
