@@ -11,7 +11,8 @@ struct IntMatrix{
   ~IntMatrix();
   IntMatrix(const IntMatrix & rhs);
   IntMatrix operator=(const IntMatrix & rhs);
-  void IntMatrix::add_string(size_t str_id, int element);
+  void add_string(size_t str_id, int element);
+  void add_column(size_t str_id, int element);
   int * data;
   size_t size;
 };
@@ -49,7 +50,7 @@ int main(int argc, char ** argv)
       }
       else if (c1 == 2)
       {
-        //second method
+        matrix.add_column(c2, c3);
       }
       else if (c3 == 3)
       {
@@ -135,4 +136,25 @@ void IntMatrix::add_string(size_t str_id, int element)
   data = temp;
   size+=cols;
   rows++;
+}
+void IntMatrix::add_column(size_t str_id, int element)
+{
+    size_t count = 0;
+    int * temp = new int [size + rows];
+    for (size_t i = 0; i < size + rows; ++i)
+    {
+        if (i == count * rows + str_id and count < rows)
+        {
+            temp[i] = element;
+            count++;
+        }
+        else
+        {
+            temp[i] = get(i - count);
+        }
+    }
+    delete[] data;
+    data = temp;
+    size+=rows;
+    cols++;
 }
