@@ -1,99 +1,264 @@
 #include <iostream>
+#include <fstream>
 
-struct IntArray{
-  void add (unsigned int i);
-  unsigned int get(size_t id) const noexcept;
+struct IntMatrix{
+  void add (int i);
+  int get(size_t id) const noexcept;
   int at(size_t id) const;
   size_t getsize() const noexcept;
-  unsigned int last() const noexcept;
-  IntArray(unsigned int i);
-  ~IntArray();
-  IntArray(const IntArray & rhs);
-  IntArray operator=(const IntArray & rhs);
-  unsigned int * a;
+  int last() const noexcept;
+  IntMatrix(int i);
+  ~IntMatrix();
+  IntMatrix(const IntMatrix & rhs);
+  IntMatrix & operator=(const IntMatrix & rhs);
+  void add_string(size_t str_id, int element);
+  void add_column(size_t str_id, int element);
+  void add(size_t str_id1, size_t str_id2);
+  void output();
+  int * data;
   size_t size;
+  size_t rows;
+  size_t cols;
 };
 
-int main()
+int main(int argc, char ** argv)
 {
   try
   {
-    unsigned int next = 0;
-    std::cin >> next;
-    IntArray a(next);
-    while (std::cin >> next)
+    std::ifstream input(argv[1]);
+    size_t rows = 0, cols = 0;
+    int first = 0;
+    input >> rows >> cols >> first;
+    if (std::cin.fail())
     {
-      a.add(next);
+      throw std::invalid_argument("Invalid data");
     }
-    if (std::cin.fail() and !std::cin.eof())
+    IntMatrix matrix(first);
+    matrix.rows = rows;
+    matrix.cols = cols;
+    for (size_t i = 1; i < rows * cols; ++i)
     {
-      std::cerr << "Error: wrong input\n";
-      return 1;
+      int temp = 0;
+      if(input >> temp)
+      {
+        matrix.add(temp);
+      }
+      else
+      {
+        throw std::invalid_argument("Bad element");
+      }
     }
-    size_t count = 1;
-    for (size_t i = 0; i < a.size() - 1; ++i)
+    std::cout << "Write your commands\n";
+    while(true)
     {
-      unsigned int d = a.get(i);
-      count += !(d % a.last())? 1 : 0;
+      int c1 = 0, c2 = 0, c3 = 0;
+      if (std::cin >> c1 >> c2 >> c3)
+      {
+        if (c1 == 1)
+        {
+          if (c2 > rows)
+          {
+            throw std::logic_error("Overflow mean: not enough");
+          }
+          else
+          {
+            matrix.add_string(c2, c3);
+          }
+        }
+        else if (c1 == 2)
+        {
+          if (c2 > cols)
+          {
+            throw std::logic_error("Oveflow mean: not enough columns");
+          }
+          else
+          {
+            matrix.add_column(c2, c3);
+          }
+        }
+        else if (c1 == 3)
+        {
+          if (c2 > rows or c3 > cols)
+          {
+            throw std::logic_error("Overflow mean: not enough rows and columns");
+          }
+          else
+          {
+            matrix.add(c2, c3);
+          }
+        }
+        else
+        {
+          throw std::logic_error("Unknown command");
+        }
+      }
+      else
+      {
+        if (std::cin.eof())
+        {
+          break;
+        }
+        else
+        {
+          throw std::logic_error("Wrong commands or arguments");
+        }
+      }
     }
-    std::cout << count << "\n";
+    matrix.output();
   }
-  catch( const std::bad_alloc & error)
+  catch(std::invalid_argument & err)
   {
-    std::cerr << error.what() << "\n";
+    std::cerr << err.what();
+    return 1;
+  }
+  catch (std::logic_error & msg)
+  {
+    std::cerr << msg.what();
+    return 3;
+  }
+  catch (std::bad_alloc& e)
+  {
+    std::cerr << e.what();
     return 2;
   }
 }
-
-IntArray::~IntArray()
+IntMatrix::~IntMatrix()
 {
-  delete [] a;
+  delete [] data;
 }
-IntArray::IntArray(unsigned int i) :
-  a(new unsigned int [1]),
-  k(1)
+IntMatrix::IntMatrix(int i) :
+  data(new int [1]),
+  size(1),
+  rows(1),
+  cols(1)
+  
 {
-  a[0] = i;
+  data[0] = i;
 }
-unsigned int IntArray::get(size_t id) const noexcept
+int IntMatrix::get(size_t id) const noexcept
 {
-  return a[id];
+  return data[id];
 }
-size_t IntArray::size() const noexcept
+size_t IntMatrix::getsize() const noexcept
 {
-  return k;
+  return size;
 }
-unsigned int IntArray::last() const noexcept
+int IntMatrix::last() const noexcept
 {
-  return get(size() - 1);
+  return get(getsize() - 1);
 }
-void IntArray::add(unsigned int i)
+void IntMatrix::add(int i)
 {
-  unsigned int * temp = new unsigned int [size() + 1];
-  for (size_t n = 0; n < size(); ++n)
+  int * temp = new int [getsize() + 1];
+  for (size_t n = 0; n < getsize(); ++n)
   {
-    temp[i] = get(i);
+    temp[n] = get(n);
   }
-  temp[size()] = i;
-  delete[] a;
-  a = temp;
+  temp[getsize()] = i;
+  delete[] data;
+  data = temp;
   ++size;
 }
-IntArray3::IntArray(const IntArray & rhs) :
-  data(new unsigned int [rhs.getsize()]),
-  getsize(rhs.getsize())
+IntMatrix::IntMatrix(const IntMatrix & rhs) :
+  data(new int [rhs.getsize()]),
+  size(rhs.getsize()),
+  rows(rhs.rows),
+  cols(rhs.cols)
 {
   for (size_t i = 0; i < getsize(); ++i){
     data[i] = rhs.get(i);
   }
 }
-IntArray & IntArray::operator=(const IntArray & rhs){
-  unsigned int * temp = new unsigned int [rhs.getsize()];
+IntMatrix& IntMatrix::operator=(const IntMatrix & rhs){
+  int * temp = new int [rhs.getsize()];
   for (size_t i = 0; i < rhs.getsize(); ++i){
     temp[i] = rhs.get(i);
   }
   delete [] data;
   data = temp;
   size = rhs.getsize();
+  rows = rhs.rows;
+  cols = rhs.cols;
   return *this;
 }
+void IntMatrix::add_string(size_t str_id, int element)
+{
+  int * temp = new int [size + cols];
+  for (size_t i = 0; i < size + cols; ++i)
+  {
+    if (i < cols * str_id){
+      temp[i] = get(i);
+    }
+      else if (cols * str_id <= i and i < cols * (str_id + 1))
+    {
+      temp[i] = element;
+    }
+    else if (i >= cols * (str_id + 1))
+    {
+      temp[i] = get(i - cols);
+    }
+  }
+  delete [] data;
+  data = temp;
+  size+=cols;
+  rows++;
+}
+void IntMatrix::add_column(size_t str_id, int element)
+{
+    size_t count = 0;
+    int * temp = new int [size + rows];
+    for (size_t i = 0; i < size + rows; ++i)
+    {
+        if (i == count * (rows + 1) + str_id and count < rows)
+        {
+            temp[i] = element;
+            count++;
+        }
+        else
+        {
+            temp[i] = get(i - count);
+        }
+    }
+    delete[] data;
+    data = temp;
+    size+=rows;
+    cols++;
+}
+void IntMatrix::add(size_t str_id1, size_t str_id2)
+{
+  int * temp = new int [size + cols + rows + 1];
+  size_t count = 0, count_data = 0;
+  for (size_t i = 0; i < size + rows + cols + 1; ++i)
+  {
+    if (count < rows + 1 and i == (cols + 1) * count + str_id2)
+    {
+      temp[i] = 0;
+      count++;
+    }
+    else if (i >= (cols + 1) * str_id1 and i < (cols + 1) * (str_id1 + 1))
+    {
+      temp[i] = 0;
+    }
+    else
+    {
+      temp[i] = get(count_data);
+      count_data++;
+    }
+  }
+  size+=(cols + rows + 1);
+  rows++;
+  cols++;
+  delete [] data;
+  data = temp;
+}
+void IntMatrix::output()
+{
+  for (size_t i = 0; i < size; i++)
+  {
+    std::cout << data[i] << " ";
+    if ((i + 1) % cols == 0)
+    {
+      std::cout << "\n";
+    }
+  }
+}  
