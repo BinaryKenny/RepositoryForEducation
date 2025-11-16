@@ -11,6 +11,7 @@ struct IntMatrix{
   ~IntMatrix();
   IntMatrix(const IntMatrix & rhs);
   IntMatrix operator=(const IntMatrix & rhs);
+  void IntMatrix::add_string(size_t str_id, int element);
   int * data;
   size_t size;
 };
@@ -38,10 +39,13 @@ int main(int argc, char ** argv)
     while(!(std::cin.eof()))
     {
       int c1 = 0, c2 = 0, c3 = 0;
-      std::cin >> c1 >> c2 >> c3;
+      if (!(std::cin >> c1 >> c2 >> c3))
+      {
+        throw std::logic_error("Wong commands or arguments");
+      }
       if (c1 == 1)
       {
-        //first method
+        matrix.add_string(c2, c3);
       }
       else if (c1 == 2)
       {
@@ -109,4 +113,26 @@ IntMatrix & IntMatrix::operator=(const IntMatrix & rhs){
   data = temp;
   size = rhs.getsize();
   return *this;
+}
+void IntMatrix::add_string(size_t str_id, int element)
+{
+  int * temp = new int [size + cols];
+  for (size_t i = 0; i < size + cols; ++i)
+  {
+    if (i < cols * str_id){
+      temp[i] = get(i);
+    }
+      else if (cols * str_id <= i and i < cols * (str_id + 1))
+    {
+      temp[i] = element;
+    }
+    else if (i >= cols * (str_id + 1))
+    {
+      temp[i] = get(i - cols);
+    }
+  }
+  delete [] data;
+  data = temp;
+  size+=cols;
+  rows++;
 }
