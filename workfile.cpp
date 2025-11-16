@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 struct IntMatrix{
   void add (int i);
@@ -14,14 +15,52 @@ struct IntMatrix{
   size_t size;
 };
 
-int main()
+int main(int argc, char ** argv)
 {
-  
+  std:ifstream input (argv[1]);
+  size_t rows = 0, cols = 0;
+  int first = 0;
+  input >> rows >> cols >> first;
+  IntMatrix matrix(first);
+  for (size_t i = 1; i < rows * cols; ++i)
+  {
+    int temp = 0;
+    if(input >> temp)
+    {
+      matrix.add(temp);
+    }
+    else
+    {
+      delete [] matrix;
+      throw std::invalid_argument("Bad element");
+    }
+    std::cout << "Write your commands\n";
+    while(!(std::cin.eof()))
+    {
+      int c1 = 0, c2 = 0, c3 = 0;
+      std::cin >> c1 >> c2 >> c3;
+      if (c1 == 1)
+      {
+        //first method
+      }
+      else if (c1 == 2)
+      {
+        //second method
+      }
+      else if (c3 == 3)
+      {
+        //third method
+      }
+      else
+      {
+        throw std::invalid_argument("Unknown command");
+      }
+    }
 }
 
 IntMatrix::~IntMatrix()
 {
-  delete [] a;
+  delete [] data;
 }
 IntMatrix::IntMatrix(int i) :
   data(new int [1]),
@@ -31,7 +70,7 @@ IntMatrix::IntMatrix(int i) :
 }
 int IntMatrix::get(size_t id) const noexcept
 {
-  return a[id];
+  return data[id];
 }
 size_t IntMatrix::getsize() const noexcept
 {
