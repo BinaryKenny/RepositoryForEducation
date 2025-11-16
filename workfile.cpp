@@ -10,13 +10,12 @@ struct IntMatrix{
   IntMatrix(int i);
   ~IntMatrix();
   IntMatrix(const IntMatrix & rhs);
-  IntMatrix operator=(const IntMatrix & rhs);
+  IntMatrix & operator=(const IntMatrix & rhs);
   void add_string(size_t str_id, int element);
   void add_column(size_t str_id, int element);
   void add(size_t str_id1, size_t str_id2);
   void output();
   int * data;
-  size_t size;
   size_t size;
   size_t rows;
   size_t cols;
@@ -24,23 +23,30 @@ struct IntMatrix{
 
 int main(int argc, char ** argv)
 {
-  std:ifstream input (argv[1]);
-  size_t rows = 0, cols = 0;
-  int first = 0;
-  input >> rows >> cols >> first;
-  IntMatrix matrix(first);
-  matrix.rows = rows;
-  matrix.cols = cols;
-  for (size_t i = 1; i < rows * cols; ++i)
+  try
   {
-    int temp = 0;
-    if(input >> temp)
+    std::ifstream input(argv[1]);
+    size_t rows = 0, cols = 0;
+    int first = 0;
+    input >> rows >> cols >> first;
+    if (std::cin.fail())
     {
-      matrix.add(temp);
+      throw std::invalid_argument("Invalid data");
     }
-    else
+    IntMatrix matrix(first);
+    matrix.rows = rows;
+    matrix.cols = cols;
+    for (size_t i = 1; i < rows * cols; ++i)
     {
-      throw std::invalid_argument("Bad element");
+      int temp = 0;
+      if(input >> temp)
+      {
+        matrix.add(temp);
+      }
+      else
+      {
+        throw std::invalid_argument("Bad element");
+      }
     }
     std::cout << "Write your commands\n";
     while(true)
@@ -50,19 +56,40 @@ int main(int argc, char ** argv)
       {
         if (c1 == 1)
         {
-          matrix.add_string(c2, c3);
+          if (c2 > rows)
+          {
+            throw std::logic_error("Overflow mean: not enough");
+          }
+          else
+          {
+            matrix.add_string(c2, c3);
+          }
         }
         else if (c1 == 2)
         {
-          matrix.add_column(c2, c3);
+          if (c2 > cols)
+          {
+            throw std::logic_error("Oveflow mean: not enough columns");
+          }
+          else
+          {
+            matrix.add_column(c2, c3);
+          }
         }
-        else if (c3 == 3)
+        else if (c1 == 3)
         {
-          matrix.add(c2, c3);
+          if (c2 > rows or c3 > cols)
+          {
+            throw std::logic_error("Overflow mean: not enough rows and columns");
+          }
+          else
+          {
+            matrix.add(c2, c3);
+          }
         }
         else
         {
-          throw std::invalid_argument("Unknown command");
+          throw std::logic_error("Unknown command");
         }
       }
       else
@@ -73,13 +100,28 @@ int main(int argc, char ** argv)
         }
         else
         {
-           throw std::logic_error("Wrong commands or arguments");
+          throw std::logic_error("Wrong commands or arguments");
         }
       }
     }
-  matrix.output();
+    matrix.output();
+  }
+  catch(std::invalid_argument & err)
+  {
+    std::cerr << err.what();
+    return 1;
+  }
+  catch (std::logic_error & msg)
+  {
+    std::cerr << msg.what();
+    return 3;
+  }
+  catch (std::bad_alloc& e)
+  {
+    std::cerr << e.what();
+    return 2;
+  }
 }
-
 IntMatrix::~IntMatrix()
 {
   delete [] data;
@@ -110,7 +152,7 @@ void IntMatrix::add(int i)
   int * temp = new int [getsize() + 1];
   for (size_t n = 0; n < getsize(); ++n)
   {
-    temp[i] = get(i);
+    temp[n] = get(n);
   }
   temp[getsize()] = i;
   delete[] data;
@@ -127,7 +169,7 @@ IntMatrix::IntMatrix(const IntMatrix & rhs) :
     data[i] = rhs.get(i);
   }
 }
-IntMatrix & IntMatrix::operator=(const IntMatrix & rhs){
+IntMatrix& IntMatrix::operator=(const IntMatrix & rhs){
   int * temp = new int [rhs.getsize()];
   for (size_t i = 0; i < rhs.getsize(); ++i){
     temp[i] = rhs.get(i);
