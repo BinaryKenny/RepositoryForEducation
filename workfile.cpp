@@ -1,16 +1,16 @@
 #include <iostream>
 
-struct IntArray{
-  void add (unsigned int i);
-  unsigned int get(size_t id) const noexcept;
+struct IntMatrix{
+  void add (int i);
+  int get(size_t id) const noexcept;
   int at(size_t id) const;
   size_t getsize() const noexcept;
-  unsigned int last() const noexcept;
-  IntArray(unsigned int i);
-  ~IntArray();
-  IntArray(const IntArray & rhs);
-  IntArray operator=(const IntArray & rhs);
-  unsigned int * a;
+  int last() const noexcept;
+  IntMatrix(int i);
+  ~IntMatrix();
+  IntMatrix(const IntMatrix & rhs);
+  IntMatrix operator=(const IntMatrix & rhs);
+  int * data;
   size_t size;
 };
 
@@ -18,9 +18,9 @@ int main()
 {
   try
   {
-    unsigned int next = 0;
+    int next = 0;
     std::cin >> next;
-    IntArray a(next);
+    IntMatrix a(next);
     while (std::cin >> next)
     {
       a.add(next);
@@ -33,7 +33,7 @@ int main()
     size_t count = 1;
     for (size_t i = 0; i < a.size() - 1; ++i)
     {
-      unsigned int d = a.get(i);
+      int d = a.get(i);
       count += !(d % a.last())? 1 : 0;
     }
     std::cout << count << "\n";
@@ -45,50 +45,50 @@ int main()
   }
 }
 
-IntArray::~IntArray()
+IntMatrix::~IntMatrix()
 {
   delete [] a;
 }
-IntArray::IntArray(unsigned int i) :
-  a(new unsigned int [1]),
-  k(1)
+IntMatrix::IntMatrix(int i) :
+  data(new int [1]),
+  size(1)
 {
   a[0] = i;
 }
-unsigned int IntArray::get(size_t id) const noexcept
+int IntMatrix::get(size_t id) const noexcept
 {
   return a[id];
 }
-size_t IntArray::size() const noexcept
+size_t IntMatrix::getsize() const noexcept
 {
-  return k;
+  return size;
 }
-unsigned int IntArray::last() const noexcept
+int IntMatrix::last() const noexcept
 {
-  return get(size() - 1);
+  return get(getsize() - 1);
 }
-void IntArray::add(unsigned int i)
+void IntMatrix::add(int i)
 {
-  unsigned int * temp = new unsigned int [size() + 1];
-  for (size_t n = 0; n < size(); ++n)
+  int * temp = new int [getsize() + 1];
+  for (size_t n = 0; n < getsize(); ++n)
   {
     temp[i] = get(i);
   }
-  temp[size()] = i;
-  delete[] a;
-  a = temp;
+  temp[getsize()] = i;
+  delete[] data;
+  data = temp;
   ++size;
 }
-IntArray3::IntArray(const IntArray & rhs) :
-  data(new unsigned int [rhs.getsize()]),
-  getsize(rhs.getsize())
+IntMatrix::IntMatrix(const IntMatrix & rhs) :
+  data(new int [rhs.getsize()]),
+  size(rhs.getsize())
 {
   for (size_t i = 0; i < getsize(); ++i){
     data[i] = rhs.get(i);
   }
 }
-IntArray & IntArray::operator=(const IntArray & rhs){
-  unsigned int * temp = new unsigned int [rhs.getsize()];
+IntMatrix & IntMatrix::operator=(const IntMatrix & rhs){
+  int * temp = new int [rhs.getsize()];
   for (size_t i = 0; i < rhs.getsize(); ++i){
     temp[i] = rhs.get(i);
   }
